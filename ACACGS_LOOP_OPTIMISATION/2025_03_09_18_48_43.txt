@@ -1,0 +1,26 @@
+
+===== Final Statistics =====
+Executable name:      ./acacgs
+Dimensions:           50 50 50
+Number of iterations: 149
+Final residual:       2.213569e-28
+
+=== Time ==
+Total:           1.761692e+00 seconds
+ddot Kernel:     1.217046e-01 seconds
+waxpby Kernel:   6.817237e-02 seconds
+sparsemv Kernel: 1.571464e+00 seconds
+
+=== FLOP ==
+Total:           1.192000e+09 floating point operations
+ddot Kernel:     7.450000e+07 floating point operations
+waxpby Kernel:   1.117500e+08 floating point operations
+sparsemv Kernel: 1.005750e+09 floating point operations
+
+=== MFLOP/s ==
+Total:           6.766221e+02 MFLOP/s
+ddot Kernel:     6.121377e+02 MFLOP/s
+waxpby Kernel:   1.639227e+03 MFLOP/s
+sparsemv Kernel: 6.400084e+02 MFLOP/s
+
+Difference between computed and exact = 2.886580e-15 

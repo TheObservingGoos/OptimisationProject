@@ -2,6 +2,7 @@
 #include <ctype.h>
 #include <assert.h>
 #include <math.h>
+#include <omp.h>
 
 #include "sparsemv.h"
 
@@ -15,11 +16,11 @@
  */
 int sparsemv(struct mesh *A, const double * const x, double * const y)
 {
-
   const int nrow = (const int) A->local_nrow;
-  int loopFactor = 8;
+  int loopFactor = 4;
   int j;  
 
+//   #pragma omp parallel for schedule(dynamic, 4) firstprivate(nrow)
   for (int i=0; i< nrow; i++) {
       double sum = 0.0;
       const double * const cur_vals = (const double * const) A->ptr_to_vals_in_row[i];
@@ -27,15 +28,13 @@ int sparsemv(struct mesh *A, const double * const x, double * const y)
       const int cur_nnz = (const int) A->nnz_in_row[i];
 
       int loopN = (cur_nnz / loopFactor) * loopFactor;
+
+    //   #pragma omp parallel for reduction(+:sum) firstprivate(loopN, loopFactor)
       for (j=0; j<loopN; j+=loopFactor) {
         sum += cur_vals[j]*x[cur_inds[j]];
         sum += cur_vals[j+1]*x[cur_inds[j+1]];
         sum += cur_vals[j+2]*x[cur_inds[j+2]];
         sum += cur_vals[j+3]*x[cur_inds[j+3]];
-        sum += cur_vals[j+4]*x[cur_inds[j+4]];
-        sum += cur_vals[j+5]*x[cur_inds[j+5]];
-        sum += cur_vals[j+6]*x[cur_inds[j+6]];
-        sum += cur_vals[j+7]*x[cur_inds[j+7]];
       }
       for (; j<cur_nnz; j++){
         sum += cur_vals[j]*x[cur_inds[j]];
