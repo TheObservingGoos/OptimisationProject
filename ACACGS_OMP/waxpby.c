@@ -1,5 +1,7 @@
 #include "waxpby.h"
 #include <omp.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #ifdef __APPLE__
 	#include <GLUT/glut.h>
@@ -23,59 +25,63 @@
 int waxpby (const int n, const double alpha, const double * const x, const double beta, const double * const y, double * const w) {
 
   int loopFactor = 4;
-  int i;
+  int i = 0;
 
   int loopN = (n/loopFactor)*loopFactor;
 
   __m256d betaVec = _mm256_set1_pd(beta);
   __m256d alphaVec = _mm256_set1_pd(alpha);
 
+  // printf("alpha: %e\n\n", alpha);
+  // printf("beta: %e\n\n", beta);
+
   if (alpha==1.0) {
-    #pragma omp parallel for shared(betaVec, alphaVec) firstprivate(loopN, loopFactor)
+    #pragma omp parallel for firstprivate(loopFactor, loopN) lastprivate(i) schedule(guided)
     for (i=0; i<loopN; i+=loopFactor) {
-      __m256d wVec = _mm256_loadu_pd(w+i);
+      // printf("Number of Threads: %d\n\n", omp_get_num_threads());
+      // printf("Thread: %d\n\n", omp_get_thread_num());
       __m256d xVec = _mm256_loadu_pd(x+i);
       __m256d yVec = _mm256_loadu_pd(y+i);
 
       __m256d betaTotalVec = _mm256_mul_pd(betaVec, yVec);
-      wVec = _mm256_add_pd(betaTotalVec, xVec);
+      __m256d wVec = _mm256_add_pd(betaTotalVec, xVec);
       
       _mm256_storeu_pd(w+i, wVec);
     }
+    // printf("n: %d\ni: %d\n\n", n, i);
     for(; i<n; i++){
       w[i] = x[i] + beta * y[i];
     }
+
   } else if(beta==1.0) {
-    #pragma omp parallel for shared(betaVec, alphaVec) firstprivate(loopN, loopFactor)
     for (i=0; i<loopN; i+=loopFactor) {
-      __m256d wVec = _mm256_loadu_pd(w+i);
       __m256d xVec = _mm256_loadu_pd(x+i);
       __m256d yVec = _mm256_loadu_pd(y+i);
 
       __m256d alphaTotalVec = _mm256_mul_pd(alphaVec, xVec);
-      wVec = _mm256_add_pd(alphaTotalVec, yVec);
+      __m256d wVec = _mm256_add_pd(alphaTotalVec, yVec);
 
       _mm256_storeu_pd(w+i, wVec);
     }
     for(; i<n; i++){
       w[i] = alpha * x[i] + y[i];
     }
+
   } else {
     for (i=0; i<loopN; i+=loopFactor) {
-
-      __m256d wVec = _mm256_loadu_pd(w+i);
       __m256d xVec = _mm256_loadu_pd(x+i);
       __m256d yVec = _mm256_loadu_pd(y+i);
 
       __m256d alphaTotalVec = _mm256_mul_pd(alphaVec, xVec);
       __m256d betaTotalVec = _mm256_mul_pd(betaVec, yVec);
-      wVec = _mm256_add_pd(alphaTotalVec, betaTotalVec);
+      __m256d wVec = _mm256_add_pd(alphaTotalVec, betaTotalVec);
 
       _mm256_storeu_pd(w+i, wVec);
     }
     for(; i<n; i++){
       w[i] = alpha * x[i] + beta * y[i];
     }
+    
   }
 
   return 0;

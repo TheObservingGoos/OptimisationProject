@@ -126,7 +126,6 @@ int main(int argc, char *argv[])
 
   /* Print out final stats */
   printf("%s", finalStats);
-  printf("Number of Threads: %d\n\n", omp_get_num_threads());
 
   /* Generate final stats file */
   FILE *fptr;

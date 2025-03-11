@@ -25,12 +25,10 @@ int ddot (const int n, const double * const x, const double * const y, double * 
   int loopN = (n/loopFactor)*loopFactor;
   int i;  
 
-  __m256d sumVec = _mm256_setzero_pd();
-
   if (y==x){
-    #pragma omp parallel for reduction(+:local_result) firstprivate(loopN, loopFactor, sumVec)
     for (i=0; i<loopN; i+=loopFactor) {
       __m256d xVec = _mm256_loadu_pd(x+i);
+      __m256d sumVec = _mm256_setzero_pd();
       xVec = _mm256_mul_pd(xVec, xVec);
       sumVec = _mm256_add_pd(sumVec, xVec);
       double temp[4];
@@ -41,10 +39,10 @@ int ddot (const int n, const double * const x, const double * const y, double * 
       local_result += x[i]*x[i];
     }
   } else {
-    #pragma omp parallel for reduction(+:local_result) firstprivate(loopN, loopFactor, sumVec)
     for (i=0; i<loopN; i+=loopFactor) {
       __m256d xVec = _mm256_loadu_pd(x+i);
       __m256d yVec = _mm256_loadu_pd(y+i);
+      __m256d sumVec = _mm256_setzero_pd();
       xVec = _mm256_mul_pd(xVec, yVec);
       sumVec = _mm256_add_pd(sumVec, xVec);
       double temp[4];
