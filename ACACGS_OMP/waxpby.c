@@ -28,6 +28,7 @@ int waxpby (const int n, const double alpha, const double * const x, const doubl
   int i = 0;
 
   int loopN = (n/loopFactor)*loopFactor;
+  omp_set_num_threads(4);
 
   __m256d betaVec = _mm256_set1_pd(beta);
   __m256d alphaVec = _mm256_set1_pd(alpha);
@@ -36,7 +37,7 @@ int waxpby (const int n, const double alpha, const double * const x, const doubl
   // printf("beta: %e\n\n", beta);
 
   if (alpha==1.0) {
-    #pragma omp parallel for firstprivate(loopFactor, loopN) lastprivate(i) schedule(guided)
+    #pragma omp parallel for firstprivate(loopFactor, loopN, betaVec) lastprivate(i) schedule(guided)
     for (i=0; i<loopN; i+=loopFactor) {
       // printf("Number of Threads: %d\n\n", omp_get_num_threads());
       // printf("Thread: %d\n\n", omp_get_thread_num());

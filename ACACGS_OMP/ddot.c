@@ -19,19 +19,22 @@
  * @return int 0 if no error
  */
 int ddot (const int n, const double * const x, const double * const y, double * const result) {  
+  omp_set_num_threads(4);
+
   double local_result = 0.0;
   
   int loopFactor = 4;
   int loopN = (n/loopFactor)*loopFactor;
-  int i;  
+  int i;
+  double temp[4];
 
   if (y==x){
+    #pragma omp parallel for private(temp) lastprivate(i) firstprivate(loopFactor, loopN) reduction(+:local_result) schedule(guided)
     for (i=0; i<loopN; i+=loopFactor) {
       __m256d xVec = _mm256_loadu_pd(x+i);
       __m256d sumVec = _mm256_setzero_pd();
       xVec = _mm256_mul_pd(xVec, xVec);
       sumVec = _mm256_add_pd(sumVec, xVec);
-      double temp[4];
       _mm256_storeu_pd(temp, sumVec);
       local_result += temp[0] + temp[1] + temp[2] + temp[3];
     }
@@ -39,13 +42,13 @@ int ddot (const int n, const double * const x, const double * const y, double * 
       local_result += x[i]*x[i];
     }
   } else {
+    #pragma omp parallel for private(temp) lastprivate(i) firstprivate(loopFactor, loopN) reduction(+:local_result) schedule(guided)
     for (i=0; i<loopN; i+=loopFactor) {
       __m256d xVec = _mm256_loadu_pd(x+i);
       __m256d yVec = _mm256_loadu_pd(y+i);
       __m256d sumVec = _mm256_setzero_pd();
       xVec = _mm256_mul_pd(xVec, yVec);
       sumVec = _mm256_add_pd(sumVec, xVec);
-      double temp[4];
       _mm256_storeu_pd(temp, sumVec);
       local_result += temp[0] + temp[1] + temp[2] + temp[3];
     }

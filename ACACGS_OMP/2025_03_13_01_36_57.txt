@@ -1,0 +1,26 @@
+
+===== Final Statistics =====
+Executable name:      /dcs/23/u5538497/Modules/CS257/OptimisationProject/ACACGS_OMP/./acacgs
+Dimensions:           100 100 100
+Number of iterations: 149
+Final residual:       7.994893e-21
+
+=== Time ==
+Total:           3.683028e+00 seconds
+ddot Kernel:     1.804921e-01 seconds
+waxpby Kernel:   3.551236e-01 seconds
+sparsemv Kernel: 3.146919e+00 seconds
+
+=== FLOP ==
+Total:           9.536000e+09 floating point operations
+ddot Kernel:     5.960000e+08 floating point operations
+waxpby Kernel:   8.940000e+08 floating point operations
+sparsemv Kernel: 8.046000e+09 floating point operations
+
+=== MFLOP/s ==
+Total:           2.589174e+03 MFLOP/s
+ddot Kernel:     3.302084e+03 MFLOP/s
+waxpby Kernel:   2.517433e+03 MFLOP/s
+sparsemv Kernel: 2.556787e+03 MFLOP/s
+
+Difference between computed and exact = 3.108624e-15 

@@ -17,6 +17,8 @@
  */
 int sparsemv(struct mesh *A, const double * const x, double * const y)
 {
+    omp_set_num_threads(4);
+
     const int nrow = (const int) A->local_nrow;
     int loopFactor = 4;
     int j;  

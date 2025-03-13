@@ -37,7 +37,7 @@ int waxpby (const int n, const double alpha, const double * const x, const doubl
 
       __m256d betaTotalVec = _mm256_mul_pd(betaVec, yVec);
       wVec = _mm256_add_pd(betaTotalVec, xVec);
-      
+
       _mm256_storeu_pd(w+i, wVec);
     }
     for(; i<n; i++){
